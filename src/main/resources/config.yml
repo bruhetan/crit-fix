@@ -1,2 +1,2 @@
 enable-fall-distance-fix: true
-enable-low-ground-fix: true
+enable-low-ground-fix: false
