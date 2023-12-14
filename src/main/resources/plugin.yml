@@ -1,0 +1,6 @@
+name: CritFix
+author: etan
+description: 'Fixes for de-synced critical hits.'
+version: '${project.version}'
+main: etan.critfix.CritFix
+api-version: '1.20'
