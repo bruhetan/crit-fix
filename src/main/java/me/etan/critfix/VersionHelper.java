@@ -1,5 +1,7 @@
 package me.etan.critfix;
 
+import org.bukkit.Bukkit;
+
 import java.util.Map;
 
 public class VersionHelper {
@@ -65,5 +67,10 @@ public class VersionHelper {
         }
 
         return (closestEntry != null) ? closestEntry.getValue() : null;
+    }
+
+    public static String getNMSVersion() {
+        String packageName = Bukkit.getServer().getClass().getPackage().getName();
+        return packageName.substring(packageName.lastIndexOf('.') + 1);
     }
 }
