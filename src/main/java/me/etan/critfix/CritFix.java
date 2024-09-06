@@ -74,7 +74,6 @@ public final class CritFix extends JavaPlugin implements Listener {
         float fallDistance = damager.getFallDistance();
         float oldFallDistance = fallDistances.getOrDefault(damager, 0f);
         double yVelocity = damager.getVelocity().getY();
-        Bukkit.broadcastMessage(damager.getName() + " " + yVelocity);
 
         // Use old fall distance if fall distance was reset due to damager being attacked right before
         if (fallDistance == 0 && oldFallDistance > 0 && yVelocity < 0)
