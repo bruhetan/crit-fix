@@ -21,33 +21,37 @@ public final class CritFix extends JavaPlugin implements Listener {
     private Method getHandleMethod;
     private Field onGroundField;
 
+    private boolean useLowGroundFix = true;
+
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
 
-        String nmsVersion = VersionHelper.getNMSVersion();
+        String minecraftVersion = Bukkit.getMinecraftVersion();
 
-        if (!VersionHelper.isSupportedVersion(nmsVersion)) {
-            Bukkit.getLogger().warning("Unsupported version: " + nmsVersion + ". Disabling low-ground fix.");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
+        // Check if the version is supported for low-ground fix
+        if (!VersionHelper.isSupportedVersion(minecraftVersion)) {
+            Bukkit.getLogger().warning("Unsupported version: " + minecraftVersion + ". Disabling low-ground fix.");
+            useLowGroundFix = false;
         }
 
         try {
-            Class<?> craftEntityClass = Class.forName("org.bukkit.craftbukkit." + nmsVersion + ".entity.CraftEntity");
+            Class<?> craftEntityClass = Class.forName("org.bukkit.craftbukkit.entity.CraftEntity");
             getHandleMethod = craftEntityClass.getMethod("getHandle");
 
             Class<?> nmsEntityClass = Class.forName("net.minecraft.world.entity.Entity");
 
-            String fieldName = VersionHelper.getOnGroundFieldName(nmsVersion);
+            // Get the onGround field for the version, or disable the fix if it's not found
+            String fieldName = VersionHelper.getOnGroundFieldName(minecraftVersion);
             if (fieldName == null) {
-                Bukkit.getLogger().severe("Unsupported version: " + nmsVersion + ". Disabling low-ground fix.");
-                getServer().getPluginManager().disablePlugin(this);
-                return;
+                Bukkit.getLogger().severe("Could not find onGround field for version: " + minecraftVersion + ". Disabling low-ground fix.");
+                useLowGroundFix = false;
+            } else {
+                Bukkit.getLogger().info("Using onGround field: " + fieldName);
+                onGroundField = nmsEntityClass.getField(fieldName);
+                onGroundField.setAccessible(true);
             }
 
-            onGroundField = nmsEntityClass.getField(fieldName);
-            onGroundField.setAccessible(true);
         } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
@@ -60,7 +64,7 @@ public final class CritFix extends JavaPlugin implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        fallDistances.put(player, player.getFallDistance());
+        fallDistances.put(player, player.getFallDistance()); // Store the fall distance before it's reset
     }
 
     @EventHandler
@@ -70,11 +74,14 @@ public final class CritFix extends JavaPlugin implements Listener {
         float fallDistance = damager.getFallDistance();
         float oldFallDistance = fallDistances.getOrDefault(damager, 0f);
         double yVelocity = damager.getVelocity().getY();
+        Bukkit.broadcastMessage(damager.getName() + " " + yVelocity);
 
+        // Use old fall distance if fall distance was reset due to damager being attacked right before
         if (fallDistance == 0 && oldFallDistance > 0 && yVelocity < 0)
             damager.setFallDistance(oldFallDistance);
 
-        if (fallDistance > 0 && damager.isOnGround())
+        // Set player to in-air if they're still falling
+        if (useLowGroundFix && fallDistance > 0 && damager.isOnGround())
             onGroundField.set(getHandleMethod.invoke(damager), false);
     }
 

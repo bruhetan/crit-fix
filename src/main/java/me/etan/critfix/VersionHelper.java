@@ -6,15 +6,14 @@ import java.util.Map;
 
 public class VersionHelper {
     private static final Map<String, String> onGroundFieldNames = Map.of(
-            "1_20_R1", "aJ",
-            "1_19_R3", "N",
-            "1_18_R2", "y",
-            "1_17_R1", "z",
-            "1_15_R1", "t",
-            "1_14_R1", "w"
+            "1.21.0", "aG",
+            "1.20.6", "aI",
+            "1.20.0", "aJ",
+            "1.19.4", "N",
+            "1.18.2", "y"
     );
 
-    private static final String MAX_NMS_VERSION = "1_20_R3";
+    private static final String MAX_VERSION = "1.21.1";
 
     private static class Version implements Comparable<Version> {
         final int major;
@@ -22,10 +21,7 @@ public class VersionHelper {
         final String release;
 
         Version(String versionString) {
-            // Remove any non-numeric prefixes like 'v'
-            versionString = versionString.replaceFirst("[^0-9]*", "");
-
-            String[] parts = versionString.split("_");
+            String[] parts = versionString.split("\\.");
             this.major = Integer.parseInt(parts[0]);
             this.minor = Integer.parseInt(parts[1]);
             this.release = parts[2];
@@ -49,7 +45,7 @@ public class VersionHelper {
 
     public static boolean isSupportedVersion(String version) {
         Version queryVersion = new Version(version);
-        Version maxSupportedVersion = new Version(MAX_NMS_VERSION);
+        Version maxSupportedVersion = new Version(MAX_VERSION);
         return queryVersion.isLessThanOrEqual(maxSupportedVersion);
     }
 
@@ -67,10 +63,5 @@ public class VersionHelper {
         }
 
         return (closestEntry != null) ? closestEntry.getValue() : null;
-    }
-
-    public static String getNMSVersion() {
-        String packageName = Bukkit.getServer().getClass().getPackage().getName();
-        return packageName.substring(packageName.lastIndexOf('.') + 1);
     }
 }
