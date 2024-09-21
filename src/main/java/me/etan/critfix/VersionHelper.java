@@ -1,16 +1,11 @@
 package me.etan.critfix;
 
-import org.bukkit.Bukkit;
-
 import java.util.Map;
 
 public class VersionHelper {
     private static final Map<String, String> onGroundFieldNames = Map.of(
             "1.21.0", "aG",
-            "1.20.6", "aI",
-            "1.20.0", "aJ",
-            "1.19.4", "N",
-            "1.18.2", "y"
+            "1.20.6", "aI"
     );
 
     private static final String MAX_VERSION = "1.21.1";
