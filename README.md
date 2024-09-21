@@ -9,3 +9,6 @@ If you're hit by an opponent right before you hit, it's possible that your fall 
 ### Case 2
 When hitting an opponent directly before landing, it's possible that your client tells the server that you're on the ground, even if you still get the critical hit client-side. 
 This issue is likely to be a problem with the client and not the server.
+
+## Important note
+The low-ground portion (Case 2) of this plugin will only work on PaperMC on versions 1.20.6+.
