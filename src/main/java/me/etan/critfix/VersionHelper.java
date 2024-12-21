@@ -4,11 +4,12 @@ import java.util.Map;
 
 public class VersionHelper {
     private static final Map<String, String> onGroundFieldNames = Map.of(
+            "1.21.3", "aD",
             "1.21.0", "aG",
             "1.20.6", "aI"
     );
 
-    private static final String MAX_VERSION = "1.21.1";
+    private static final String MAX_VERSION = "1.21.4";
 
     private static class Version implements Comparable<Version> {
         final int major;

@@ -35,25 +35,27 @@ public final class CritFix extends JavaPlugin implements Listener {
             useLowGroundFix = false;
         }
 
-        try {
-            Class<?> craftEntityClass = Class.forName("org.bukkit.craftbukkit.entity.CraftEntity");
-            getHandleMethod = craftEntityClass.getMethod("getHandle");
+        if (useLowGroundFix) {
+            try {
+                Class<?> craftEntityClass = Class.forName("org.bukkit.craftbukkit.entity.CraftEntity");
+                getHandleMethod = craftEntityClass.getMethod("getHandle");
 
-            Class<?> nmsEntityClass = Class.forName("net.minecraft.world.entity.Entity");
+                Class<?> nmsEntityClass = Class.forName("net.minecraft.world.entity.Entity");
 
-            // Get the onGround field for the version, or disable the fix if it's not found
-            String fieldName = VersionHelper.getOnGroundFieldName(minecraftVersion);
-            if (fieldName == null) {
-                Bukkit.getLogger().severe("Could not find onGround field for version: " + minecraftVersion + ". Disabling low-ground fix.");
-                useLowGroundFix = false;
-            } else {
-                Bukkit.getLogger().info("Using onGround field: " + fieldName);
-                onGroundField = nmsEntityClass.getField(fieldName);
-                onGroundField.setAccessible(true);
+                // Get the onGround field for the version, or disable the fix if it's not found
+                String fieldName = VersionHelper.getOnGroundFieldName(minecraftVersion);
+                if (fieldName == null) {
+                    Bukkit.getLogger().severe("Could not find onGround field for version: " + minecraftVersion + ". Disabling low-ground fix.");
+                    useLowGroundFix = false;
+                } else {
+                    Bukkit.getLogger().info("Using onGround field: " + fieldName);
+                    onGroundField = nmsEntityClass.getField(fieldName);
+                    onGroundField.setAccessible(true);
+                }
+
+            } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException e) {
+                throw new RuntimeException(e);
             }
-
-        } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException e) {
-            throw new RuntimeException(e);
         }
     }
 
